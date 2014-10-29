@@ -18,4 +18,5 @@ public:
 	static void initialize();
 	static void clear_all();
 	static void free_safe(unsigned long* ptr);
+	static Array* get_text_array(unsigned long id);
 };

@@ -7,6 +7,35 @@ void ChangeText(HWND hwnd, Array* arr, TCHAR* text);
 
 #define MAX_TEXT_FILE 60
 #define DisplayTexts_WideCharSize 2048
+#define MAX_LANG 7
+
+#define L_JAP_FILE TEXT("Data/Text/kana/%d.txt")
+#define L_ENG_FILE TEXT("Data/Text/en/%d.txt")
+#define L_FRA_FILE TEXT("Data/Text/fr/%d.txt")
+#define L_ITA_FILE TEXT("Data/Text/it/%d.txt")
+#define L_ESP_FILE TEXT("Data/Text/es/%d.txt")
+#define L_KOR_FILE TEXT("Data/Text/ko/%d.txt")
+#define L_DEU_FILE TEXT("Data/Text/de/%d.txt")
+
+#define L_ALL_FILES { \
+	L_JAP_FILE, \
+	L_ENG_FILE, \
+	L_FRA_FILE, \
+	L_ITA_FILE, \
+	L_ESP_FILE, \
+	L_DEU_FILE, \
+	L_KOR_FILE \
+}
+
+#define EDIT_List_File { \
+	IDC_EDIT2, \
+	IDC_EDIT3, \
+	IDC_EDIT4, \
+	IDC_EDIT5, \
+	IDC_EDIT6, \
+	IDC_EDIT7, \
+	IDC_EDIT8 \
+}
 
 #define FILE_IDs { \
 	1, \
@@ -133,11 +162,3 @@ void ChangeText(HWND hwnd, Array* arr, TCHAR* text);
 	IDS_STRING190, \
 	IDS_STRING191 \
 }
-
-#define L_JAP_FILE TEXT("Data/Text/kana/%d.txt")
-#define L_ENG_FILE TEXT("Data/Text/en/%d.txt")
-#define L_FRA_FILE TEXT("Data/Text/fr/%d.txt")
-#define L_ITA_FILE TEXT("Data/Text/it/%d.txt")
-#define L_ESP_FILE TEXT("Data/Text/es/%d.txt")
-#define L_KOR_FILE TEXT("Data/Text/ko/%d.txt")
-#define L_DEU_FILE TEXT("Data/Text/de/%d.txt")

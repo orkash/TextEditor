@@ -71,6 +71,9 @@
     <ClCompile Include="Liste_Fichiers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Max_WNDPROC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TextEditor.rc">

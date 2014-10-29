@@ -131,6 +131,7 @@
     <ClCompile Include="Editor_WNDPROC.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Liste_Fichiers.cpp" />
+    <ClCompile Include="Max_WNDPROC.cpp" />
     <ClCompile Include="Option_WNDPROC.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

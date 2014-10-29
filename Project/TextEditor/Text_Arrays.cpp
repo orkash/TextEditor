@@ -64,6 +64,24 @@ void Text_Arrays::free_safe(unsigned long* ptr)
 		free(ptr);
 }
 
+//---
+//Méthode de récupération d'un tableau de texte
+//---
+Array* Text_Arrays::get_text_array(unsigned long id)
+{
+	switch(id)
+	{
+	case 0:return kana;
+	case 1:return en;
+	case 2:return fr;
+	case 3:return it;
+	case 4:return de;
+	case 5:return es;
+	case 6:return ko;
+	}
+	return get_text_array(id>>(id&0x03));
+}
+
 Text_Arrays::Text_Arrays(void)
 {
 }

@@ -49,6 +49,12 @@ BOOL CALLBACK Editor_WNDPROC(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 			//Menu "Quitter"
 			PostQuitMessage(0);
 			break;
+		case ID_OUTILS_MODIFIERLEMAXIMUM:
+			//Menu modifier le maximum
+			DialogBox(global_get_hInst(),MAKEINTRESOURCE(IDD_DIALOG3),hDlg,Max_WNDPROC);
+			SetDlgItemInt(hDlg,IDC_EDIT9,Text_Arrays::kana->get_size(),FALSE);
+			DisplayTexts(hDlg,0);
+			break;
 		case IDC_EDIT1:
 			//Champ du numéro de texte
 			switch(wmEvent)

@@ -12,6 +12,8 @@ public:
 	void load_from_utf8_rn(char* str);
 	void clear();
 	void clear_wf(unsigned long* function);
+	void delete_at(unsigned long index,unsigned long* function=NULL);
+	void delete_from_to(unsigned long index, unsigned long count,unsigned long* function=NULL);
 	
 private:
 	unsigned long* ptr;

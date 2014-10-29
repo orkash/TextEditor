@@ -11,6 +11,10 @@
 int file_ids[] = FILE_IDs;
 //Variable évitant la récursion des changements de contenu des EDIT CONTROL.
 BOOL do_not_change = FALSE;
+//Tableau contenant les string non formatés des fichiers pour les différentes langues
+TCHAR* files[] = L_ALL_FILES;
+//Tableau contenant les ids des champs pour les différentes langues
+DWORD edit_fields[] = EDIT_List_File;
 
 //---
 //Création de la liste des fichiers
@@ -47,7 +51,9 @@ void LoadFile(HWND hwnd, unsigned long pos)
 	TCHAR filename[128];
 	File* f;
 	char* file_data;
+	unsigned long i;
 	unsigned long file_id=file_ids[pos];
+	TCHAR error[1024];
 
 	//---
 	//Si c'est le même fichier on recharge pas
@@ -77,163 +83,39 @@ void LoadFile(HWND hwnd, unsigned long pos)
 	Text_Arrays::clear_all();
 	
 	//---
-	//Chargement du fichier japonais (Kana uniquement)
+	//>Chargement des fichiers dans toutes les langues
 	//---
-	wsprintf(filename,L_JAP_FILE,file_id);
-	//Chargement du fichier
-	f=new File(filename,"r");
-	//Si le chargement a échoué on abandonne
-	if(f->closed())
+	for(i=0;i<MAX_LANG;i++)
 	{
+		wsprintf(filename,files[i],file_id);
+		//Chargement du fichier
+		f=new File(filename,"r");
+		//Si le chargement a échoué le fichier est fermé
+		if(f->closed())
+		{
+			wsprintf(error,TEXT("Unable to load %s..."),filename);
+			MessageBox(hwnd,error,NULL,MB_ICONERROR);
+			delete f;
+			return;
+		}
+		//On lit l'intégralité du fichier
+		file_data=(char*)f->read(f->get_size());
+		//Si la lecture échoue
+		if(!file_data)
+		{
+			wsprintf(error,TEXT("Unable to read %s..."),filename);
+			MessageBox(hwnd,error,NULL,MB_ICONERROR);
+			delete f;
+			return;
+		}
+		//On charge les textes dans le tableau correspondant
+		Text_Arrays::get_text_array(i)->load_from_utf8_rn(file_data);
+		//On libère la mémoire utilisée lors du chargement
+		free(file_data);
+		//On ferme le fichier
+		f->close();
 		delete f;
-		return;
 	}
-	//On lit l'intégralité du fichier
-	file_data=(char*)f->read(f->get_size());
-	//Si la lecture a échouée on abandonne
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	//On charge les textes dans un tableau pour une manipulation plus facile.
-	Text_Arrays::kana->load_from_utf8_rn(file_data);
-	//On libère les données chargés du fichier qui ne nous servent plus
-	free(file_data);
-	f->close();
-	delete f;
-
-
-	//---
-	//Chargement du fichier anglais
-	//---
-	wsprintf(filename,L_ENG_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::en->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-	
-
-	//---
-	//Chargement du fichier français
-	//---
-	wsprintf(filename,L_FRA_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::fr->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-
-	//---
-	//Chargement du fichier italien
-	//---
-	wsprintf(filename,L_ITA_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::it->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-
-
-	//---
-	//Chargement du fichier espagnole
-	//---
-	wsprintf(filename,L_ESP_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::es->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-
-
-	//---
-	//Chargement du fichier coréen
-	//---
-	wsprintf(filename,L_KOR_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::ko->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-
-
-	//---
-	//Chargement du fichier allemand
-	//---
-	wsprintf(filename,L_DEU_FILE,file_id);
-	f=new File(filename,"r");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	file_data=(char*)f->read(f->get_size());
-	if(!file_data)
-	{
-		delete f;
-		return;
-	}
-	Text_Arrays::de->load_from_utf8_rn(file_data);
-	free(file_data);
-	f->close();
-	delete f;
-
 	//On met à jour les informations sur le nombre de textes (basé sur le JAP) et l'index actuel.
 	SetDlgItemInt(hwnd,IDC_EDIT9,Text_Arrays::kana->get_size(),FALSE);
 	SetDlgItemInt(hwnd,IDC_EDIT1,0,FALSE);
@@ -251,6 +133,7 @@ void DisplayTexts(HWND hwnd, long add)
 {
 	long max=GetDlgItemInt(hwnd,IDC_EDIT9,NULL,FALSE);
 	long position=GetDlgItemInt(hwnd,IDC_EDIT1,NULL,FALSE);
+	unsigned long i;
 	TCHAR widechar[DisplayTexts_WideCharSize];
 	LPCSTR multibyte;
 	position+=add;
@@ -260,43 +143,17 @@ void DisplayTexts(HWND hwnd, long add)
 		//On met à jour la position uniquement si elle a été changée depuis le "Spin Control"
 		if(add)
 			SetDlgItemInt(hwnd,IDC_EDIT1,position,FALSE);
-
-
 		do_not_change=TRUE;
-		//Affichage du texte JAP
-		multibyte=(LPCSTR)Text_Arrays::kana->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT2,widechar);
 
-		//Affichage du texte Anglais
-		multibyte=(LPCSTR)Text_Arrays::en->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT3,widechar);
+		//Affichage du texte dans toutes les langues
+		for(i=0;i<MAX_LANG;i++)
+		{
+			multibyte=(LPCSTR)Text_Arrays::get_text_array(i)->get(position);
+			MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
+			SetDlgItemText(hwnd,edit_fields[i],widechar);
+			SendDlgItemMessage(hwnd,edit_fields[i],EM_SETLIMITTEXT,DisplayTexts_WideCharSize,NULL);
+		}
 
-		//Affichage du texte Français
-		multibyte=(LPCSTR)Text_Arrays::fr->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT4,widechar);
-
-		//Affichage du texte Italien
-		multibyte=(LPCSTR)Text_Arrays::it->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT5,widechar);
-
-		//Affichage du texte Allemand
-		multibyte=(LPCSTR)Text_Arrays::de->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT6,widechar);
-
-		//Affichage du texte Espagnole
-		multibyte=(LPCSTR)Text_Arrays::es->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT7,widechar);
-
-		//Affichage du texte Coréen
-		multibyte=(LPCSTR)Text_Arrays::ko->get(position);
-		MultiByteToWideChar(CP_UTF8,NULL,multibyte,-1,widechar,DisplayTexts_WideCharSize);
-		SetDlgItemText(hwnd,IDC_EDIT8,widechar);
 		do_not_change=FALSE;
 	}
 	else if(position>max)
@@ -311,156 +168,41 @@ void DisplayTexts(HWND hwnd, long add)
 //---
 void SaveFile(unsigned long id)
 {
-	TCHAR filename[1024];
+	TCHAR filename[128];
 	char* filedata;
 	File* f;
+	unsigned long i;
+	TCHAR error[1024];
 	//---
-	//Enregistrement fichier japonais
+	//Enregistrement des fichiers dans les diverses langues
 	//---
-	wsprintf(filename,L_JAP_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
+	for(i=0;i<MAX_LANG;i++)
 	{
+		wsprintf(filename,files[i],id);
+		//On ouvre le fichier en écriture
+		f=new File(filename,"w");
+		//Si le fichier est fermé c'est qu'on a pas réussit à l'ouvrir donc on abandonne
+		if(f->closed())
+		{
+			wsprintf(error,TEXT("Unable to open %s..."),filename);
+			MessageBox(NULL,error,NULL,MB_ICONERROR);
+			delete f;
+			return;
+		}
+		//On met les textes les un derrière les autres avec un retour à la ligne
+		filedata=Text_Arrays::get_text_array(i)->utf8_join("\r\n");
+		//Si l'opération a échouée on abandonne
+		if(!filedata)
+		{
+			delete f;
+			return;
+		}
+		//On écrit le fichier
+		f->write(filedata,strlen(filedata));
+		f->close();
 		delete f;
-		return;
+		free(filedata);
 	}
-	filedata=Text_Arrays::kana->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-	
-	//---
-	//Enregistrement fichier Anglais
-	//---
-	wsprintf(filename,L_ENG_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::en->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-	
-	//---
-	//Enregistrement fichier Français
-	//---
-	wsprintf(filename,L_FRA_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::fr->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-	
-	//---
-	//Enregistrement fichier Italiens
-	//---
-	wsprintf(filename,L_ITA_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::it->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-
-	
-	//---
-	//Enregistrement fichier Espagnoles
-	//---
-	wsprintf(filename,L_ESP_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::es->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-	
-	//---
-	//Enregistrement fichier Coréen
-	//---
-	wsprintf(filename,L_KOR_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::ko->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
-	
-	//---
-	//Enregistrement fichier Allemands
-	//---
-	wsprintf(filename,L_DEU_FILE,id);
-	f=new File(filename,"w");
-	if(f->closed())
-	{
-		delete f;
-		return;
-	}
-	filedata=Text_Arrays::de->utf8_join("\r\n");
-	if(!filedata)
-	{
-		delete f;
-		return;
-	}
-	f->write(filedata,strlen(filedata));
-	f->close();
-	free(filedata);
-	delete f;
 
 	Text_Arrays::changes=FALSE;
 }
@@ -470,14 +212,14 @@ void SaveFile(unsigned long id)
 //---
 void ChangeText(HWND hwnd, Array* arr, TCHAR* text)
 {
-	char multibyte[2048];
+	char multibyte[DisplayTexts_WideCharSize];
 	unsigned long size;
 	char* data;
 	TCHAR error_str[256];
 	long position=GetDlgItemInt(hwnd,IDC_EDIT1,NULL,FALSE);
 	if(do_not_change)
 		return;
-	if(size=WideCharToMultiByte(CP_UTF8,NULL,text,-1,multibyte,2048,NULL,NULL))
+	if(size=WideCharToMultiByte(CP_UTF8,NULL,text,-1,multibyte,DisplayTexts_WideCharSize,NULL,NULL))
 	{
 		data=(char*)realloc((void*)arr->get(position),size+1);
 		if(data)
